@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daron 5 — Peintre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0e0e0d;
+  --cream:#f7f5f0;
+  --warm:#f0ebe0;
+  --mid:#888880;
+  --gold:#b8935a;
+  --gold2:#8a6a3a;
+  --white:#ffffff;
+  --display:'Playfair Display',serif;
+  --ui:'Syne',sans-serif;
+  --text:'Instrument Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--cream);color:var(--ink);font-family:var(--ui);font-weight:300;overflow-x:hidden;cursor:none}
+
+/* ── CURSOR ── */
+.cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference}
+.cursor-dot{width:8px;height:8px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(255,255,255,.6);border-radius:50%;transform:translate(-50%,-50%);transition:all .12s ease;position:fixed;pointer-events:none;z-index:9998;mix-blend-mode:difference}
+body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:56px;height:56px;border-color:#fff}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.6rem 3rem;
+  mix-blend-mode:normal;
+  transition:background .4s,padding .3s;
+}
+nav.scrolled{background:rgba(247,245,240,.92);backdrop-filter:blur(16px);padding:1rem 3rem;border-bottom:1px solid rgba(0,0,0,.06)}
+.nav-brand{display:flex;align-items:center;gap:.9rem;text-decoration:none}
+.nav-logo{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.12))}
+.nav-name{font-family:var(--display);font-size:1.1rem;font-weight:700;letter-spacing:.08em;color:var(--ink);line-height:1}
+.nav-name small{display:block;font-family:var(--ui);font-weight:300;font-size:.55rem;letter-spacing:.35em;text-transform:uppercase;color:var(--mid);margin-top:.15rem;font-style:normal}
+.nav-links{display:flex;gap:2.8rem;list-style:none;align-items:center}
+.nav-links a{font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);text-decoration:none;opacity:.55;transition:opacity .2s}
+.nav-links a:hover{opacity:1}
+.nav-cta{background:var(--ink)!important;color:var(--cream)!important;opacity:1!important;padding:.55rem 1.4rem;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;transition:background .2s!important}
+.nav-cta:hover{background:var(--gold2)!important}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto 1fr;
+  position:relative;
+  overflow:hidden;
+}
+.hero-left{
+  grid-column:1;grid-row:1/3;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:9rem 4rem 5rem;
+  position:relative;z-index:2;
+  background:var(--cream);
+}
+.hero-eyebrow{
+  font-size:.62rem;letter-spacing:.45em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:2.5rem;
+  display:flex;align-items:center;gap:1rem;
+  animation:fadeUp .8s ease both .2s;
+}
+.hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--gold)}
+.hero-h1{
+  font-family:var(--display);
+  font-size:clamp(4.5rem,8vw,8rem);
+  font-weight:900;line-height:.92;
+  letter-spacing:-.01em;
+  animation:fadeUp .9s ease both .35s;
+  margin-bottom:2rem;
+}
+.hero-h1 em{font-style:italic;font-weight:400;color:var(--gold);display:block}
+.hero-intro{
+  font-family:var(--text);font-style:italic;
+  font-size:1.12rem;line-height:1.8;color:var(--mid);
+  max-width:380px;
+  animation:fadeUp .9s ease both .5s;
+  margin-bottom:3rem;
+}
+.hero-actions{display:flex;gap:1rem;animation:fadeUp .9s ease both .65s}
+.btn-fill{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:1rem 2.2rem;background:var(--ink);color:var(--cream);
+  font-family:var(--ui);font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;
+  text-decoration:none;border:none;cursor:none;
+  transition:background .22s,gap .22s;
+}
+.btn-fill:hover{background:var(--gold2);gap:1rem}
+.btn-line{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:1rem 2.2rem;border:1px solid var(--ink);color:var(--ink);
+  font-family:var(--ui);font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;
+  text-decoration:none;background:none;cursor:none;
+  transition:all .22s;
+}
+.btn-line:hover{background:var(--ink);color:var(--cream)}
+.hero-scroll{
+  margin-top:4rem;
+  font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);
+  display:flex;align-items:center;gap:.8rem;animation:fadeUp .9s ease both .8s;
+}
+.hero-scroll-line{width:48px;height:1px;background:var(--mid)}
+
+.hero-right{
+  grid-column:2;grid-row:1/3;
+  position:relative;overflow:hidden;
+  background:var(--ink);
+}
+.hero-img-wrap{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-logo-display{
+  width:55%;opacity:.12;
+  filter:invert(1);
+  animation:scaleIn 1.4s ease both .1s;
+}
+.hero-overlay-text{
+  position:absolute;bottom:5rem;left:3rem;right:3rem;z-index:2;
+  animation:fadeUp .9s ease both .7s;
+}
+.hero-quote{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:clamp(1.4rem,2.5vw,2.2rem);
+  color:rgba(255,255,255,.85);line-height:1.35;
+}
+.hero-quote-attr{
+  margin-top:1rem;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);display:flex;align-items:center;gap:.8rem;
+}
+.hero-quote-attr::before{content:'';width:24px;height:1px;background:var(--gold)}
+/* vertical label */
+.hero-vert{
+  position:absolute;right:2rem;top:50%;transform:translateY(-50%) rotate(90deg);
+  font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(255,255,255,.25);
+  white-space:nowrap;
+}
+
+/* ── MARQUEE ── */
+.marquee-wrap{
+  background:var(--ink);overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:.7rem 0;
+}
+.marquee-track{display:flex;white-space:nowrap;animation:marquee 28s linear infinite}
+.marquee-item{
+  font-family:var(--display);font-style:italic;
+  font-size:1.1rem;color:rgba(255,255,255,.35);
+  padding:0 2.5rem;
+}
+.marquee-sep{color:var(--gold);opacity:.6}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── ABOUT ── */
+#about{padding:10rem 0;overflow:hidden}
+.about-inner{max-width:1440px;margin:0 auto;padding:0 3rem}
+.about-grid{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:8rem;align-items:center;
+}
+.about-visual{position:relative}
+.about-img-main{
+  width:100%;aspect-ratio:2/3;
+  background:linear-gradient(150deg,#d6c9ae,#b09472);
+  overflow:hidden;position:relative;
+}
+.about-img-main img{width:100%;height:100%;object-fit:cover;display:block}
+.about-img-main .ph{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1rem;
+  color:rgba(255,255,255,.5);font-family:var(--display);
+  font-size:.95rem;letter-spacing:.15em;font-style:italic;
+}
+.about-img-float{
+  position:absolute;bottom:-4rem;right:-4rem;
+  width:52%;aspect-ratio:1;
+  background:var(--warm);
+  border:8px solid var(--cream);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 24px 80px rgba(0,0,0,.12);
+}
+.about-img-float img{width:100%;height:100%;object-fit:cover}
+.about-img-float .ph2{
+  font-family:var(--display);font-style:italic;font-size:.85rem;
+  color:var(--mid);letter-spacing:.1em;
+}
+.about-year-badge{
+  position:absolute;top:3rem;left:-2rem;
+  background:var(--gold);color:var(--white);
+  padding:1.2rem 1rem;text-align:center;
+  box-shadow:0 8px 32px rgba(184,147,90,.4);
+}
+.about-year-badge span{display:block;font-family:var(--display);font-size:2rem;font-weight:700;line-height:1}
+.about-year-badge small{font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;opacity:.85}
+
+.about-text{}
+.about-kicker{font-size:.62rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.about-kicker::before{content:'';width:28px;height:1px;background:var(--gold)}
+.about-h2{font-family:var(--display);font-size:clamp(2.8rem,4vw,4.2rem);font-weight:700;line-height:1.05;letter-spacing:-.01em;margin-bottom:2rem}
+.about-h2 em{font-style:italic;font-weight:400;color:var(--gold)}
+.about-p{font-family:var(--text);font-size:1.05rem;line-height:1.9;color:var(--mid);margin-bottom:1.2rem}
+.about-p strong{color:var(--ink);font-weight:400;font-style:italic}
+.about-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2rem;margin:2.5rem 0;
+  padding-top:2rem;border-top:1px solid rgba(0,0,0,.08);
+}
+.stat{text-align:center}
+.stat-n{font-family:var(--display);font-size:2.8rem;font-weight:700;color:var(--ink);display:block;line-height:1}
+.stat-l{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--mid);margin-top:.4rem;display:block}
+
+/* ── GALLERY ── */
+#gallery{background:var(--ink);padding:8rem 0;overflow:hidden}
+.gallery-inner{max-width:1440px;margin:0 auto;padding:0 3rem}
+.gallery-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:4rem;
+}
+.gallery-h2{
+  font-family:var(--display);font-size:clamp(3rem,5vw,5.5rem);
+  font-weight:700;color:var(--cream);line-height:.92;letter-spacing:-.01em;
+}
+.gallery-h2 em{font-style:italic;font-weight:400;color:var(--gold)}
+.series-tabs{display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(255,255,255,.15);max-width:100%}
+.series-tab{
+  font-family:var(--ui);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  background:none;border:none;border-right:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.35);padding:.65rem 1.2rem;cursor:none;transition:all .2s;
+  white-space:nowrap;
+}
+.series-tab:last-child{border-right:none}
+.series-tab.active,.series-tab:hover{background:var(--gold);color:var(--white);border-color:var(--gold)}
+
+/* Main viewer */
+.gallery-viewer{
+  display:grid;grid-template-columns:1fr 340px;
+  gap:0;border:1px solid rgba(255,255,255,.08);
+}
+.viewer-main{position:relative;background:#161614}
+.viewer-artwork{
+  width:100%;aspect-ratio:4/3;overflow:hidden;position:relative;
+}
+.viewer-artwork img{width:100%;height:100%;object-fit:cover;display:none;transition:transform .7s ease}
+.viewer-artwork:hover img{transform:scale(1.04)}
+.artwork-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1.2rem;
+  color:rgba(255,255,255,.12);
+  font-family:var(--display);font-style:italic;font-size:1.1rem;letter-spacing:.1em;
+}
+.viewer-thumbs{
+  display:flex;gap:0;border-top:1px solid rgba(255,255,255,.08);
+  overflow-x:auto;
+}
+.viewer-thumbs::-webkit-scrollbar{height:2px}
+.viewer-thumbs::-webkit-scrollbar-thumb{background:var(--gold)}
+.vthumb{
+  width:80px;height:80px;flex-shrink:0;cursor:none;
+  overflow:hidden;opacity:.35;transition:opacity .2s;
+  border-right:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+.vthumb.active{opacity:1;outline:2px solid var(--gold);outline-offset:-2px}
+.vthumb:hover{opacity:.75}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:none}
+.vthumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+
+/* Info panel */
+.viewer-info{
+  border-left:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;
+  background:#111110;
+}
+.info-top{padding:2rem 1.8rem;flex:1}
+.info-number{
+  font-family:var(--display);font-size:4rem;font-weight:700;
+  color:rgba(255,255,255,.06);line-height:1;margin-bottom:-.5rem;
+  user-select:none;
+}
+.info-title{
+  font-family:var(--display);font-weight:700;font-size:1.7rem;
+  color:var(--cream);line-height:1.1;margin-bottom:1.4rem;
+  border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:1.2rem;
+}
+.info-meta{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.5rem}
+.meta-row{display:flex;flex-direction:column;gap:.18rem}
+.meta-label{font-size:.55rem;letter-spacing:.32em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.meta-val{font-size:.88rem;color:rgba(255,255,255,.7);font-family:var(--text);font-style:italic}
+.info-poem{
+  border-left:2px solid var(--gold);padding:.9rem 1.1rem;
+  font-family:var(--display);font-style:italic;font-size:.95rem;
+  line-height:1.8;color:rgba(255,255,255,.45);
+  margin-top:1rem;
+}
+.info-poem p{white-space:pre-line}
+.info-bottom{padding:1.5rem 1.8rem;border-top:1px solid rgba(255,255,255,.08)}
+.btn-enquire{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:.7rem;
+  padding:1rem;background:none;
+  border:1px solid rgba(255,255,255,.2);
+  color:var(--cream);font-family:var(--ui);font-size:.62rem;
+  letter-spacing:.22em;text-transform:uppercase;
+  cursor:none;transition:all .22s;
+}
+.btn-enquire:hover,.btn-enquire.selected{background:var(--gold);border-color:var(--gold)}
+
+/* ── BASKET ── */
+.basket-fab{
+  position:fixed;bottom:2.5rem;right:2.5rem;z-index:400;
+  display:none;
+}
+.basket-fab.show{display:block}
+.basket-btn{
+  display:flex;align-items:center;gap:.8rem;
+  background:var(--ink);color:var(--cream);border:none;
+  padding:1.05rem 1.8rem;cursor:none;
+  font-family:var(--ui);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  box-shadow:0 12px 40px rgba(0,0,0,.3);transition:background .22s;
+}
+.basket-btn:hover{background:var(--gold2)}
+.basket-count{
+  background:var(--gold);color:var(--white);
+  min-width:20px;height:20px;border-radius:10px;padding:0 4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;
+}
+
+/* ── MODAL ── */
+.overlay{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(8,8,7,.8);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;padding:1.5rem;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--cream);max-width:680px;width:100%;
+  max-height:92vh;overflow-y:auto;position:relative;
+  transform:translateY(20px) scale(.98);transition:transform .35s;
+}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-header{
+  background:var(--ink);padding:2.5rem 2.5rem 2rem;
+  position:sticky;top:0;z-index:1;
+}
+.modal-title{font-family:var(--display);font-size:2rem;font-weight:700;color:var(--cream);margin-bottom:.3rem}
+.modal-sub{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+.modal-close{
+  position:absolute;top:1.2rem;right:1.5rem;
+  background:none;border:none;cursor:none;
+  font-size:1.1rem;color:rgba(255,255,255,.45);transition:color .2s;
+}
+.modal-close:hover{color:var(--cream)}
+.modal-body{padding:2rem 2.5rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.8rem}
+.chip{
+  display:flex;align-items:center;gap:.5rem;
+  border:1px solid rgba(0,0,0,.15);padding:.35rem .5rem .35rem .35rem;
+  font-size:.75rem;background:var(--white);
+}
+.chip-thumb{width:32px;height:32px;overflow:hidden;background:var(--warm);flex-shrink:0}
+.chip-thumb img{width:100%;height:100%;object-fit:cover;display:none}
+.chip-x{background:none;border:none;cursor:none;color:var(--mid);font-size:.8rem;transition:color .15s;padding:0 0 0 .2rem}
+.chip-x:hover{color:#c0392b}
+
+.emailjs-note{
+  background:#fff8ec;border-left:3px solid var(--gold);
+  padding:1rem 1.2rem;margin-bottom:1.5rem;
+  font-size:.76rem;color:#7a5820;line-height:1.7;
+}
+.emailjs-note strong{display:block;margin-bottom:.2rem;font-size:.78rem}
+.emailjs-note a{color:var(--gold2)}
+
+.fgrp{margin-bottom:1.1rem}
+.fgrp label{display:block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem}
+.fgrp input,.fgrp textarea{
+  width:100%;border:1px solid rgba(0,0,0,.12);
+  background:var(--white);padding:.85rem 1rem;
+  font-family:var(--ui);font-size:.9rem;font-weight:300;
+  color:var(--ink);outline:none;transition:border-color .2s;resize:vertical;
+}
+.fgrp input:focus,.fgrp textarea:focus{border-color:var(--gold)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.fsub{
+  width:100%;padding:1rem;background:var(--ink);color:var(--cream);
+  border:none;font-family:var(--ui);font-size:.68rem;
+  letter-spacing:.22em;text-transform:uppercase;cursor:none;
+  transition:background .22s;margin-top:.4rem;
+}
+.fsub:hover{background:var(--gold2)}
+.fnote{font-size:.7rem;color:var(--mid);text-align:center;margin-top:.8rem}
+.fsuccess{display:none;text-align:center;padding:3rem 1rem}
+.fsuccess.show{display:block}
+.fsuccess-icon{font-size:2.5rem;margin-bottom:1rem}
+.fsuccess p{font-family:var(--display);font-size:1.9rem;font-weight:700;margin-bottom:.5rem}
+.fsuccess span{font-size:.88rem;color:var(--mid)}
+
+/* ── CONTACT ── */
+#contact{padding:10rem 0}
+.contact-inner{max-width:760px;margin:0 auto;padding:0 3rem}
+.contact-h2{font-family:var(--display);font-size:clamp(2.8rem,4.5vw,4.5rem);font-weight:700;line-height:1.0;letter-spacing:-.01em;margin-bottom:.8rem}
+.contact-h2 em{font-style:italic;font-weight:400;color:var(--gold)}
+.contact-intro{font-family:var(--text);font-style:italic;font-size:1.05rem;line-height:1.9;color:var(--mid);margin-bottom:3rem}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink);padding:4rem 3rem;
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:2rem;align-items:center;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.foot-brand{display:flex;align-items:center;gap:.9rem}
+.foot-logo{width:40px;height:40px;object-fit:contain;filter:invert(1);opacity:.7}
+.foot-name{font-family:var(--display);font-size:1.15rem;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.08em}
+.foot-center{text-align:center;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.foot-right{text-align:right;font-family:var(--display);font-style:italic;font-size:.9rem;color:rgba(255,255,255,.2)}
+
+/* ── UTILS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.15s}
+.reveal-delay-2{transition-delay:.3s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  nav{padding:1.2rem 1.5rem}
+  #hero{grid-template-columns:1fr;min-height:auto}
+  .hero-left{padding:7rem 1.5rem 4rem;grid-row:1}
+  .hero-right{height:50vw;grid-row:2}
+  .gallery-viewer{grid-template-columns:1fr}
+  .viewer-info{border-left:none;border-top:1px solid rgba(255,255,255,.08)}
+  #about,.about-inner{padding-left:1.5rem;padding-right:1.5rem}
+  .about-grid{grid-template-columns:1fr;gap:4rem}
+  .about-img-float{display:none}
+  footer{grid-template-columns:1fr;text-align:center;gap:1rem}
+  .foot-right,.foot-center{text-align:center}
+  .modal{max-height:95vh}
+  .fgrid{grid-template-columns:1fr}
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-brand" href="#hero">
+    <img class="nav-logo" src="Logo_1.jpg" alt="Daron 5">
+    <div class="nav-name">Daron 5<small>Peintre · Artiste</small></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">Accueil</a></li>
+    <li><a href="#about">L'artiste</a></li>
+    <li><a href="#gallery">Galerie</a></li>
+    <li><a href="#contact" class="nav-cta">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Peintre · Artiste plasticien</div>
+    <h1 class="hero-h1">DARON<em>Five</em></h1>
+    <p class="hero-intro">Des œuvres qui interrogent, qui respirent, qui restent. Entre matière et lumière — là où la couleur devient émotion et le geste, parole.</p>
+    <div class="hero-actions">
+      <a href="#gallery" class="btn-fill">Voir les œuvres <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#contact" class="btn-line">Contacter</a>
+    </div>
+    <div class="hero-scroll"><span class="hero-scroll-line"></span>Défiler</div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-wrap">
+      <!-- Remplacez par votre photo d'atelier : <img src="atelier.jpg" style="width:100%;height:100%;object-fit:cover;opacity:.45"> -->
+      <img class="hero-logo-display" src="Logo_1.jpg" alt="">
+    </div>
+    <div class="hero-overlay-text">
+      <p class="hero-quote">« La peinture est un silence que l'on entend. »</p>
+      <div class="hero-quote-attr">Daron 5</div>
+    </div>
+    <div class="hero-vert">Peinture · Galerie · Atelier</div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item">Daron 5</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Peinture</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item"><em>Artiste plasticien</em></span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Galerie</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Œuvres originales</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Atelier</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Collections privées</span><span class="marquee-item marquee-sep">—</span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">Daron 5</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Peinture</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item"><em>Artiste plasticien</em></span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Galerie</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Œuvres originales</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Atelier</span><span class="marquee-item marquee-sep">—</span>
+    <span class="marquee-item">Collections privées</span><span class="marquee-item marquee-sep">—</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-img-main">
+          <!-- <img src="photo-artiste.jpg" alt="Daron 5"> -->
+          <div class="ph">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Photo de l'artiste
+          </div>
+        </div>
+        <div class="about-img-float">
+          <!-- <img src="atelier-detail.jpg" alt="Atelier"> -->
+          <span class="ph2">Atelier</span>
+        </div>
+        <div class="about-year-badge"><span>15</span><small>Années</small></div>
+      </div>
+
+      <div class="about-text">
+        <div class="about-kicker reveal">Biographie</div>
+        <h2 class="about-h2 reveal">L'artiste,<br><em>le geste,</em><br>la matière.</h2>
+        <p class="about-p reveal"><strong>Daron 5</strong> est un peintre dont la pratique se situe à la croisée de la figuration contemporaine et de l'abstraction lyrique. Il développe un langage pictural reconnaissable — dense, sensible, traversé par une lumière particulière.</p>
+        <p class="about-p reveal reveal-delay-1">Ses œuvres naissent d'une double nécessité : celle du geste et celle du temps. Chaque toile s'élabore lentement, par strates successives de matière et de couleur, jusqu'à atteindre ce point d'équilibre où l'image s'impose d'elle-même.</p>
+        <div class="about-stats reveal reveal-delay-2">
+          <div class="stat"><span class="stat-n">12+</span><span class="stat-l">Expositions</span></div>
+          <div class="stat"><span class="stat-n">200+</span><span class="stat-l">Œuvres</span></div>
+          <div class="stat"><span class="stat-n">15</span><span class="stat-l">Années</span></div>
+        </div>
+        <a href="#contact" class="btn-fill reveal" style="align-self:flex-start">Contacter l'artiste <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery-inner">
+    <div class="gallery-header reveal">
+      <h2 class="gallery-h2">Les<br><em>Œuvres</em></h2>
+      <div class="series-tabs" id="seriesTabs">
+        <button class="series-tab active" onclick="loadSeries(0)">I — Origine</button>
+        <button class="series-tab" onclick="loadSeries(1)">II — Lumière</button>
+        <button class="series-tab" onclick="loadSeries(2)">III — Matière</button>
+        <button class="series-tab" onclick="loadSeries(3)">IV — Mémoire</button>
+        <button class="series-tab" onclick="loadSeries(4)">V — Corps</button>
+        <button class="series-tab" onclick="loadSeries(5)">VI — Silence</button>
+      </div>
+    </div>
+    <div class="gallery-viewer reveal">
+      <div class="viewer-main">
+        <div class="viewer-artwork" id="viewerArtwork">
+          <div class="artwork-placeholder" id="artPh">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <span id="artPhLabel">Sélectionnez une œuvre</span>
+          </div>
+          <img id="mainImg" src="" alt="">
+        </div>
+        <div class="viewer-thumbs" id="thumbsRow"></div>
+      </div>
+      <div class="viewer-info">
+        <div class="info-top">
+          <div class="info-number" id="infoNum">01</div>
+          <div class="info-title" id="infoTitle">—</div>
+          <div class="info-meta">
+            <div class="meta-row"><span class="meta-label">Technique</span><span class="meta-val" id="infoTech">—</span></div>
+            <div class="meta-row"><span class="meta-label">Format</span><span class="meta-val" id="infoFmt">—</span></div>
+            <div class="meta-row"><span class="meta-label">Année</span><span class="meta-val" id="infoYear">—</span></div>
+          </div>
+          <div class="info-poem"><p id="infoPoem">Sélectionnez une œuvre pour lire son poème.</p></div>
+        </div>
+        <div class="info-bottom">
+          <button class="btn-enquire" id="btnEnquire" onclick="addToBasket()" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Demander des informations
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="about-kicker reveal">Échangeons</div>
+    <h2 class="contact-h2 reveal">Parlons<br><em>de votre projet.</em></h2>
+    <p class="contact-intro reveal">Pour toute demande d'information sur une œuvre, une exposition, ou un projet, contactez-moi directement. Je réponds personnellement à chaque message.</p>
+    <div class="reveal">
+      <div class="emailjs-note">
+        <strong>⚙️ Configuration EmailJS requise</strong>
+        Créez un compte sur <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> et remplacez les 3 constantes en haut du script : <code>YOUR_PUBLIC_KEY</code>, <code>YOUR_SERVICE_ID</code>, <code>YOUR_TEMPLATE_ID</code>.
+      </div>
+      <div class="fgrid">
+        <div class="fgrp"><label>Prénom</label><input type="text" id="c_prenom" placeholder="Votre prénom"></div>
+        <div class="fgrp"><label>Nom</label><input type="text" id="c_nom" placeholder="Votre nom"></div>
+      </div>
+      <div class="fgrp"><label>Email</label><input type="email" id="c_email" placeholder="votre@email.com"></div>
+      <div class="fgrp"><label>Message</label><textarea id="c_msg" rows="5" placeholder="Votre message…"></textarea></div>
+      <button class="fsub" onclick="sendContact()">Envoyer le message</button>
+      <p class="fnote">Pas de boutique en ligne — tout se passe par échange direct.</p>
+      <div class="fsuccess" id="cSuccess">
+        <div class="fsuccess-icon">✓</div>
+        <p>Message envoyé.</p>
+        <span>Daron 5 vous répondra dans les plus brefs délais.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-brand">
+    <img class="foot-logo" src="Logo_1.jpg" alt="Daron 5">
+    <span class="foot-name">Daron 5</span>
+  </div>
+  <div class="foot-center">© 2025 Daron 5 — Tous droits réservés</div>
+  <div class="foot-right">Peintre · Artiste plasticien</div>
+</footer>
+
+<!-- BASKET FAB -->
+<div class="basket-fab" id="basketFab">
+  <button class="basket-btn" onclick="openModal()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Ma sélection
+    <span class="basket-count" id="bCount">0</span>
+  </button>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Demande d'infos</div>
+      <div class="modal-sub">Œuvres sélectionnées</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="chips" id="chipsList"></div>
+      <div class="emailjs-note">
+        <strong>⚙️ EmailJS</strong>
+        Remplacez <code>YOUR_PUBLIC_KEY</code> / <code>YOUR_SERVICE_ID</code> / <code>YOUR_TEMPLATE_ID</code> — <a href="https://www.emailjs.com" target="_blank">emailjs.com</a>
+      </div>
+      <div class="fgrid">
+        <div class="fgrp"><label>Prénom</label><input type="text" id="m_prenom" placeholder="Votre prénom"></div>
+        <div class="fgrp"><label>Nom</label><input type="text" id="m_nom" placeholder="Votre nom"></div>
+      </div>
+      <div class="fgrp"><label>Email</label><input type="email" id="m_email" placeholder="votre@email.com"></div>
+      <div class="fgrp"><label>Message</label><textarea id="m_msg" rows="4" placeholder="Votre question sur cette œuvre…"></textarea></div>
+      <button class="fsub" onclick="sendEnquiry()">Envoyer la demande</button>
+      <p class="fnote">Vos données ne seront utilisées qu'pour vous répondre.</p>
+    </div>
+    <div class="fsuccess" id="mSuccess" style="padding:3rem 2.5rem">
+      <div class="fsuccess-icon">✓</div>
+      <p>Demande envoyée.</p>
+      <span>Daron 5 vous répondra personnellement.</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const EJS_KEY = 'YOUR_PUBLIC_KEY';
+const EJS_SVC = 'YOUR_SERVICE_ID';
+const EJS_TPL = 'YOUR_TEMPLATE_ID';
+
+// ── ŒUVRES — modifiez ici ─────────────────────────────────────────────────────
+// Pour chaque œuvre : img:"" = placeholder coloré | img:"images/oeuvre.jpg" = votre image
+const SERIES = [
+  // ── SÉRIE I — ORIGINE
+  { name:'Série I — Origine', works:[
+    {id:101,title:"L'Éveil",           tech:"Huile sur toile",          fmt:"100 × 80 cm",  year:"2023",img:"",poem:"Au bord du silence,\nune couleur s'éveille —\nni jour ni nuit,\nle premier geste."},
+    {id:102,title:"Strate I",           tech:"Acrylique et cire",        fmt:"60 × 60 cm",   year:"2023",img:"",poem:"Sous les couches\ndort le premier trait.\nQui saura\nce qu'il portait ?"},
+    {id:103,title:"Passage",            tech:"Huile et sable sur toile", fmt:"120 × 90 cm",  year:"2022",img:"",poem:"Entre deux lumières\nle chemin s'efface.\nReste l'odeur\nde ce qui fut là."},
+    {id:104,title:"Horizon intérieur",  tech:"Huile sur toile",          fmt:"80 × 120 cm",  year:"2022",img:"",poem:"Aucun bord\nne délimite le ciel\nquand on regarde\ndu dedans."},
+    {id:105,title:"Sédiment",           tech:"Encre et acrylique",       fmt:"50 × 70 cm",   year:"2021",img:"",poem:"Les années\nse déposent comme l'argile.\nDouce, inexorable,\nla mémoire."},
+    {id:106,title:"Genèse",             tech:"Huile sur lin brut",       fmt:"130 × 100 cm", year:"2021",img:"",poem:"Avant la forme,\nil y avait ce frémissement —\nquelque chose qui voulait\nexister."}
+  ]},
+  // ── SÉRIE II — LUMIÈRE
+  { name:'Série II — Lumière', works:[
+    {id:201,title:"Solstice",           tech:"Huile sur toile",          fmt:"120 × 120 cm", year:"2023",img:"",poem:"Le jour le plus long\nne dure qu'un instant.\nC'est pour ça\nqu'on le peint."},
+    {id:202,title:"Contre-jour",        tech:"Acrylique sur papier",     fmt:"70 × 50 cm",   year:"2023",img:"",poem:"On ne voit bien\nque les silhouettes.\nLe reste est\nde l'invention."},
+    {id:203,title:"Nappe",              tech:"Huile et médium alkyde",   fmt:"90 × 70 cm",   year:"2022",img:"",poem:"La lumière se couche\nsur la toile\ncomme une main\nposée sur une épaule."},
+    {id:204,title:"Zénith",             tech:"Huile sur toile",          fmt:"100 × 100 cm", year:"2022",img:"",poem:"À midi,\nles ombres disparaissent.\nOn ne sait plus\noù finit la vérité."},
+    {id:205,title:"Crépuscule I",       tech:"Huile et résine",          fmt:"140 × 80 cm",  year:"2021",img:"",poem:"Entre chien et loup,\nle monde se dérobe.\nReste ce bord d'orange\nau-dessus des toits."},
+    {id:206,title:"Crépuscule II",      tech:"Huile et résine",          fmt:"140 × 80 cm",  year:"2021",img:"",poem:"Le ciel se tait.\nLes couleurs, elles,\nn'en finissent pas\nde crier doucement."}
+  ]},
+  // ── SÉRIE III — MATIÈRE
+  { name:'Série III — Matière', works:[
+    {id:301,title:"Peau I",             tech:"Huile et sable fin",       fmt:"80 × 80 cm",   year:"2023",img:"",poem:"La toile a une peau.\nOn la touche avant\nde la voir.\nC'est ça, peindre."},
+    {id:302,title:"Écorce",             tech:"Huile, gesso et pigments", fmt:"100 × 140 cm", year:"2022",img:"",poem:"Sous l'écorce,\nla sève circule encore.\nOn oublie trop vite\nce qui est vivant."},
+    {id:303,title:"Croûte",             tech:"Huile empâtée sur bois",   fmt:"60 × 60 cm",   year:"2022",img:"",poem:"J'empile.\nJ'arrache.\nJe recouvre.\nC'est le même geste que vivre."},
+    {id:304,title:"Argile",             tech:"Terre et acrylique",       fmt:"70 × 90 cm",   year:"2021",img:"",poem:"La terre se souvient\nde toutes les mains\nqui l'ont pétrie.\nLa mienne aussi."},
+    {id:305,title:"Calcaire",           tech:"Huile et poussière de marbre",fmt:"110 × 80 cm",year:"2021",img:"",poem:"Le blanc du calcaire\nn'est pas une absence.\nC'est un début\nqu'on n'ose pas finir."},
+    {id:306,title:"Résidu",             tech:"Techniques mixtes",        fmt:"50 × 50 cm",   year:"2020",img:"",poem:"Ce qui reste\naprès le grand feu —\nc'est encore\nquelque chose."}
+  ]},
+  // ── SÉRIE IV — MÉMOIRE
+  { name:'Série IV — Mémoire', works:[
+    {id:401,title:"Archive",            tech:"Huile sur toile ancienne", fmt:"90 × 70 cm",   year:"2023",img:"",poem:"La mémoire n'est pas\nun coffre fermé.\nC'est une fenêtre\nqu'on ne sait plus ouvrir."},
+    {id:402,title:"Palimpseste",        tech:"Acrylique sur calque",     fmt:"60 × 80 cm",   year:"2022",img:"",poem:"On écrit par-dessus.\nOn efface mal.\nC'est heureux —\nles traces font les visages."},
+    {id:403,title:"Résurgence",         tech:"Huile sur toile",          fmt:"120 × 90 cm",  year:"2022",img:"",poem:"Certains souvenirs\nremontent seuls,\nla nuit,\ncomme des bulles d'air."},
+    {id:404,title:"Enfance",            tech:"Craie et huile sur toile", fmt:"80 × 80 cm",   year:"2021",img:"",poem:"Je n'ai pas oublié\nla couleur du jardin.\nJuste son nom.\nC'est assez."},
+    {id:405,title:"Fragment I",         tech:"Huile sur papier marouflé",fmt:"40 × 60 cm",   year:"2021",img:"",poem:"Un fragment\nvaut parfois\nplus que le tout.\nMoins de mensonge."},
+    {id:406,title:"Fragment II",        tech:"Huile sur papier marouflé",fmt:"40 × 60 cm",   year:"2020",img:"",poem:"Ce morceau-là\na survécu au reste.\nPourquoi lui ?\nPeut-être le hasard. Peut-être pas."}
+  ]},
+  // ── SÉRIE V — CORPS
+  { name:'Série V — Corps', works:[
+    {id:501,title:"Posture",            tech:"Huile sur toile",          fmt:"100 × 150 cm", year:"2023",img:"",poem:"Le corps ment moins\nque le visage.\nIl dit tout\nquand il croit qu'on ne regarde pas."},
+    {id:502,title:"Inflexion",          tech:"Fusain et huile",          fmt:"70 × 100 cm",  year:"2023",img:"",poem:"Une épaule qui tombe.\nUn genou qui plie.\nIl n'en faut pas plus\npour comprendre."},
+    {id:503,title:"Vertèbre",           tech:"Huile sur lin",            fmt:"60 × 180 cm",  year:"2022",img:"",poem:"La colonne tient tout.\nSilencieuse, tenace.\nOn ne la voit jamais\njusqu'au jour où elle cède."},
+    {id:504,title:"Main gauche",        tech:"Huile sur bois",           fmt:"50 × 50 cm",   year:"2022",img:"",poem:"La main gauche\nne sait pas ce qu'elle fait.\nC'est pour ça\nqu'elle est honnête."},
+    {id:505,title:"Appui",              tech:"Acrylique et pastel",      fmt:"90 × 90 cm",   year:"2021",img:"",poem:"S'appuyer sur quelque chose.\nUn mur, un mot, une couleur.\nC'est déjà\nune façon de tenir."},
+    {id:506,title:"Seuil",              tech:"Huile sur toile",          fmt:"120 × 80 cm",  year:"2021",img:"",poem:"Le corps hésite\nsur le pas de la porte.\nDehors ou dedans —\nil ne sait plus."}
+  ]},
+  // ── SÉRIE VI — SILENCE
+  { name:'Série VI — Silence', works:[
+    {id:601,title:"Pause",              tech:"Huile sur toile",          fmt:"100 × 100 cm", year:"2024",img:"",poem:"Le silence n'est pas\nl'absence de son.\nC'est le son\nqu'on entend enfin."},
+    {id:602,title:"Blanc de baleine",   tech:"Huile et cire d'abeille",  fmt:"80 × 60 cm",   year:"2024",img:"",poem:"Il existe un blanc\nqui n'est pas vide.\nUn blanc qui attend\nsans impatience."},
+    {id:603,title:"Vide fertile",       tech:"Huile sur toile préparée", fmt:"90 × 90 cm",   year:"2023",img:"",poem:"Le rien\nn'est jamais tout à fait rien.\nSurtout en peinture.\nSurtout la nuit."},
+    {id:604,title:"Retenue",            tech:"Encre de Chine et huile",  fmt:"70 × 50 cm",   year:"2023",img:"",poem:"Ne pas tout dire.\nLaisser le bord vibrer.\nC'est la retenue\nqui donne la force."},
+    {id:605,title:"L'entre-deux",       tech:"Huile sur toile",          fmt:"110 × 80 cm",  year:"2022",img:"",poem:"Entre la couleur posée\net celle qu'on imagine —\nc'est là que vit\nle tableau."},
+    {id:606,title:"Après",              tech:"Techniques mixtes sur bois",fmt:"60 × 80 cm",  year:"2022",img:"",poem:"Après tout,\nil reste quelque chose.\nOn ne sait pas quoi.\nMais quelque chose."}
+  ]}
+];
+
+let curS=0,curW=0,basket=[];
+emailjs.init(EJS_KEY);
+
+// ── NAV SCROLL ────────────────────────────────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',scrollY>60);
+});
+
+// ── CURSOR ────────────────────────────────────────────────────────────────────
+const dot=document.getElementById('cursorDot');
+const ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{
+  dot.style.left=e.clientX+'px'; dot.style.top=e.clientY+'px';
+  ring.style.left=e.clientX+'px'; ring.style.top=e.clientY+'px';
+});
+
+// ── REVEAL ───────────────────────────────────────────────────────────────────
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ── GALLERY ───────────────────────────────────────────────────────────────────
+function loadSeries(i){
+  curS=i;
+  document.querySelectorAll('.series-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  const row=document.getElementById('thumbsRow'); row.innerHTML='';
+  SERIES[i].works.forEach((w,j)=>{
+    const t=document.createElement('div');
+    t.className='vthumb'+(j===0?' active':'');
+    t.onclick=()=>selectWork(j);
+    const ph=document.createElement('div'); ph.className='vthumb-ph';
+    if(w.img){
+      const img=document.createElement('img'); img.src=w.img; img.alt=w.title; img.style.display='block';
+      t.appendChild(img);
+    } else {
+      ph.style.background=`hsl(${30+j*28},18%,${20+j*6}%)`;
+      t.appendChild(ph);
+    }
+    row.appendChild(t);
+  });
+  selectWork(0);
+}
+
+function selectWork(j){
+  curW=j; const w=SERIES[curS].works[j];
+  document.querySelectorAll('.vthumb').forEach((t,i)=>t.classList.toggle('active',i===j));
+  const img=document.getElementById('mainImg'), ph=document.getElementById('artPh');
+  if(w.img){img.src=w.img;img.alt=w.title;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='flex';ph.style.background=`hsl(${30+j*28},12%,${12+j*5}%)`;document.getElementById('artPhLabel').textContent=w.title;}
+  document.getElementById('infoNum').textContent=String(j+1).padStart(2,'0');
+  document.getElementById('infoTitle').textContent=w.title;
+  document.getElementById('infoTech').textContent=w.tech;
+  document.getElementById('infoFmt').textContent=w.fmt;
+  document.getElementById('infoYear').textContent=w.year;
+  document.getElementById('infoPoem').textContent=w.poem;
+  const btn=document.getElementById('btnEnquire'); btn.disabled=false;
+  const inB=basket.some(b=>b.id===w.id);
+  btn.className='btn-enquire'+(inB?' selected':'');
+  btn.innerHTML=inB
+    ?`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Dans la sélection — Envoyer`
+    :`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Demander des informations`;
+}
+
+// ── BASKET ────────────────────────────────────────────────────────────────────
+function addToBasket(){
+  const w=SERIES[curS].works[curW];
+  if(!basket.some(b=>b.id===w.id)) basket.push({...w});
+  syncBasket(); openModal();
+}
+function removeFromBasket(id){
+  basket=basket.filter(b=>b.id!==id);
+  syncBasket(); renderChips();
+  if(!basket.length) closeModal();
+  selectWork(curW);
+}
+function syncBasket(){
+  document.getElementById('bCount').textContent=basket.length;
+  document.getElementById('basketFab').classList.toggle('show',basket.length>0);
+  selectWork(curW);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(){
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('mSuccess').classList.remove('show');
+  document.getElementById('modalBody').style.display='';
+  renderChips();
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open')}
+function bgClose(e){if(e.target===document.getElementById('overlay'))closeModal()}
+function renderChips(){
+  document.getElementById('chipsList').innerHTML=basket.map(w=>`
+    <div class="chip">
+      <div class="chip-thumb" style="background:hsl(30,18%,32%)">${w.img?`<img src="${w.img}" alt="${w.title}" style="display:block">`:''}</div>
+      <span>${w.title}</span>
+      <button class="chip-x" onclick="removeFromBasket(${w.id})">✕</button>
+    </div>`).join('');
+}
+
+// ── EMAIL ─────────────────────────────────────────────────────────────────────
+function sendEnquiry(){
+  const p=document.getElementById('m_prenom').value.trim(),
+        n=document.getElementById('m_nom').value.trim(),
+        e=document.getElementById('m_email').value.trim(),
+        m=document.getElementById('m_msg').value.trim();
+  if(!p||!e||!m){alert('Merci de remplir prénom, email et message.');return}
+  const artworks=basket.map(w=>`${w.title} — ${w.tech}, ${w.fmt} (${w.year})`).join('\n');
+  if(EJS_SVC==='YOUR_SERVICE_ID'){
+    document.getElementById('modalBody').style.display='none';
+    document.getElementById('mSuccess').classList.add('show');
+    basket=[];syncBasket();return;
+  }
+  emailjs.send(EJS_SVC,EJS_TPL,{from_name:`${p} ${n}`,from_email:e,message:m,artworks})
+    .then(()=>{document.getElementById('modalBody').style.display='none';document.getElementById('mSuccess').classList.add('show');basket=[];syncBasket();})
+    .catch(()=>alert('Erreur EmailJS. Vérifiez votre configuration.'));
+}
+function sendContact(){
+  const p=document.getElementById('c_prenom').value.trim(),
+        e=document.getElementById('c_email').value.trim(),
+        m=document.getElementById('c_msg').value.trim();
+  if(!p||!e||!m){alert('Merci de remplir prénom, email et message.');return}
+  if(EJS_SVC==='YOUR_SERVICE_ID'){document.getElementById('cSuccess').classList.add('show');return}
+  emailjs.send(EJS_SVC,EJS_TPL,{from_name:p,from_email:e,message:m,artworks:'(contact général)'})
+    .then(()=>document.getElementById('cSuccess').classList.add('show'))
+    .catch(()=>alert('Erreur EmailJS.'));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>loadSeries(0));
+</script>
+</body>
+</html>
