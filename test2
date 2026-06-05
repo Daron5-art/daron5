@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Artiste Peintre</title>
+    <style>
+        /* Variables de base */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #ecf0f1;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-title: 'Georgia', serif;
+        }
+
+        /* Réinitialisation */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            line-height: 1.6;
+        }
+
+        /* En-tête et Navigation */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: var(--font-title);
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #bdc3c7;
+        }
+
+        nav {
+            background-color: #1a252f;
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Sections générales */
+        section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 10px auto 0;
+        }
+
+        /* Galerie (Grille CSS) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            text-align: center;
+            transition: bottom 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-caption {
+            bottom: 0;
+        }
+
+        /* Section À Propos */
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            background: white;
+            padding: 3rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .about-image {
+            flex: 1;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .about-text {
+            flex: 2;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Section Contact */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: var(--font-main);
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* Pied de page */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .about-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête -->
+    <header id="accueil">
+        <h1>Votre Nom</h1>
+        <p>Artiste Peintre Contemporain</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#accueil">Accueil</a>
+        <a href="#galerie">Galerie</a>
+        <a href="#a-propos">À Propos</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <!-- Section Galerie -->
+    <section id="galerie">
+        <h2>Œuvres Récentes</h2>
+        <div class="gallery-grid">
+            <!-- Remplacer les URL par vos propres images -->
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Peinture 1">
+                <div class="gallery-caption">
+                    <h3>Abstrait Bleu</h3>
+                    <p>Huile sur toile - 2024</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Peinture 2">
+                <div class="gallery-caption">
+                    <h3>Éclat de Lumière</h3>
+                    <p>Acrylique - 2025</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1536924940846-227afb31e2a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Peinture 3">
+                <div class="gallery-caption">
+                    <h3>Paysage Onirique</h3>
+                    <p>Aquarelle - 2025</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Peinture 4">
+                <div class="gallery-caption">
+                    <h3>Textures Urbaines</h3>
+                    <p>Technique mixte - 2026</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section À Propos -->
+    <section id="a-propos">
+        <h2>À Propos de l'Artiste</h2>
+        <div class="about-content">
+            <div class="about-image">
+                <!-- Remplacer par votre photo -->
+                <img src="https://images.unsplash.com/photo-1518331647614-7a1f04cd34af?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Portrait de l'artiste">
+            </div>
+            <div class="about-text">
+                <p>Né(e) avec une passion inébranlable pour les couleurs et les formes, j'explore les frontières entre la réalité et l'émotion pure à travers mes toiles. Mon approche artistique est profondément enracinée dans l'expressionnisme abstrait, où chaque coup de pinceau est une traduction d'une expérience intérieure.</p>
+                <p>Après avoir étudié aux Beaux-Arts, j'ai développé une technique unique mêlant huiles, acryliques et matières organiques pour créer des textures qui invitent au toucher autant qu'à la contemplation. Mes œuvres ont été exposées dans plusieurs galeries à travers l'Europe et se trouvent dans de nombreuses collections privées.</p>
+                <p>La peinture n'est pas seulement ce que je fais, c'est la façon dont je respire le monde qui m'entoure.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Contact -->
+    <section id="contact">
+        <h2>Me Contacter</h2>
+        <div class="contact-form">
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="nom">Nom complet</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Adresse e-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="sujet">Sujet (Acquisition, Exposition, etc.)</label>
+                    <input type="text" id="sujet" name="sujet" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Votre message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit">Envoyer le message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2026 Votre Nom - Tous droits réservés.</p>
+    </footer>
+
+    <!-- Script pour le défilement fluide (Smooth Scroll) -->
+    <script>
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                window.scrollTo({
+                    top: targetElement.offsetTop - 60, // Ajustement pour la barre de navigation fixe
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
